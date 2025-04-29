@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perkiraan Cuaca</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #56ccf2, #2f80ed);
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        input {
+            padding: 12px;
+            margin: 5px;
+            width: 90%;
+            border: none;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px;
+            width: 95%;
+            border: none;
+            border-radius: 25px;
+            background-color: #ff9800;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #e68900;
+        }
+        #result {
+            margin-top: 15px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🌤️ Perkiraan Cuaca</h2>
+        <input type="text" id="city" placeholder="Masukkan nama kota (contoh: Solo, Klaten, Yogyakarta)">
+        <button onclick="getWeather()">🔍 Cari</button>
+        <button onclick="getWeatherByLocation()">📍 Gunakan Lokasi Saya</button>
+        <div id="result"></div>
+        <div id="agriculture-advice"></div>
+    </div>
+
+    <script>
+        const apiKey = 'f5d3db12244f201c9d4bfff7f06105b2';
+
+        function getWeather() {
+            let city = document.getElementById('city').value.trim();
+            if (!city) {
+                alert("Silakan masukkan nama kota!");
+                return;
+            }
+            city = `${city},ID`;
+            
+            fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=id`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod !== "200") {
+                        document.getElementById('result').innerHTML = `<p style="color: red;">${data.message}</p>`;
+                        return;
+                    }
+                    const temp = data.list[0].main.temp;
+                    const weatherDesc = data.list[0].weather[0].description;
+                    const humidity = data.list[0].main.humidity;
+                    
+                    const weatherInfo = `
+                        <h3>${data.city.name}, ${data.city.country}</h3>
+                        <p>${weatherDesc}</p>
+                        <p>🌡️ Suhu: ${temp}°C</p>
+                        <p>💧 Kelembaban: ${humidity}%</p>
+                        <p>🌬️ Kecepatan Angin: ${data.list[0].wind.speed} m/s</p>
+                    `;
+                    document.getElementById('result').innerHTML = weatherInfo;
+                    showAgricultureAdvice(temp, weatherDesc, humidity);
+                })
+                .catch(error => {
+                    console.error("Error fetching weather data:", error);
+                    document.getElementById('result').innerHTML = "<p style='color: red;'>Terjadi kesalahan. Coba lagi nanti.</p>";
+                });
+        }
+
+        function showAgricultureAdvice(temp, weatherDesc, humidity) {
+            let advice = "";
+            if (temp >= 22 && temp <= 30 && humidity > 60 && weatherDesc.includes("cerah")) {
+                advice = "🌾 Ini waktu yang bagus untuk menanam padi karena suhu dan kelembaban ideal.";
+            } else if (temp >= 15 && temp <= 25 && humidity > 50) {
+                advice = "🥦 Cocok untuk menanam sayuran seperti bayam, kangkung, dan sawi.";
+            } else if (temp < 15) {
+                advice = "⚠️ Cuaca terlalu dingin, sebaiknya hindari menanam tanaman yang membutuhkan suhu tinggi.";
+            } else {
+                advice = "🌱 Cuaca kurang optimal untuk bercocok tanam, tetapi bisa disesuaikan dengan jenis tanaman tertentu.";
+            }
+            document.getElementById('agriculture-advice').innerHTML = `<p>${advice}</p>`;
+        }
+    </script>
+</body>
+</html>

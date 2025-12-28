@@ -1,117 +1,275 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perkiraan Cuaca</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            background: linear-gradient(to right, #56ccf2, #2f80ed);
-            padding: 20px;
-            color: #fff;
-        }
-        .container {
-            max-width: 400px;
-            margin: auto;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-        }
-        input {
-            padding: 12px;
-            margin: 5px;
-            width: 90%;
-            border: none;
-            border-radius: 25px;
-            text-align: center;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            width: 95%;
-            border: none;
-            border-radius: 25px;
-            background-color: #ff9800;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #e68900;
-        }
-        #result {
-            margin-top: 15px;
-            font-size: 18px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    transition: background 0.5s ease;
+}
+
+.container {
+    width: 340px;
+    padding: 25px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    text-align: center;
+}
+
+button {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #ffffff;
+    color: #1e3c72;
+    font-weight: bold;
+}
+
+#loading {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.card {
+    background: rgba(0,0,0,0.25);
+    border-radius: 14px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.weather-icon img {
+    width: 80px;
+}
+
+.forecast {
+    text-align: left;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.badge {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.green { background: #2ecc71; }
+.yellow { background: #f1c40f; color: #000; }
+.red { background: #e74c3c; }
+
+.actions {
+    margin-top: 15px;
+    display: grid;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 12px;
+    background: rgba(255,255,255,0.25);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.home-btn {
+    padding: 12px;
+    background: rgba(255,255,255,0.25);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.home-btn:hover {
+  background: #2563eb;
+}
+
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>🌤️ Perkiraan Cuaca</h2>
-        <input type="text" id="city" placeholder="Masukkan nama kota (contoh: Solo, Klaten, Yogyakarta)">
-        <button onclick="getWeather()">🔍 Cari</button>
-        <button onclick="getWeatherByLocation()">📍 Gunakan Lokasi Saya</button>
-        <div id="result"></div>
-        <div id="agriculture-advice"></div>
+
+<div class="container">
+    <h1>🌤 Weather App</h1>
+
+    <div class="input-group">
+        <input type="text" id="city" placeholder="Masukkan kota">
+        <button onclick="getWeather()">Cari</button>
     </div>
 
-    <script>
-        const apiKey = 'f5d3db12244f201c9d4bfff7f06105b2';
+    <div id="loading"></div>
+    <div id="result"></div>
+    <div id="forecast"></div>
+    <div id="agriculture"></div>
 
-        function getWeather() {
-            let city = document.getElementById('city').value.trim();
-            if (!city) {
-                alert("Silakan masukkan nama kota!");
+    <div class="actions">
+        <button class="action-btn" onclick="clearAll()">Clear</button>
+        <button class="home-btn" onclick="goHome()">Home</button>
+
+    </div>
+</div>
+
+
+
+<script>
+const apiKey = "f5d3db12244f201c9d4bfff7f06105b2";
+
+window.onload = () => {
+    const savedCity = localStorage.getItem("lastCity");
+    if (savedCity) {
+        document.getElementById("city").value = savedCity;
+        getWeather();
+    }
+};
+
+function setBackground(desc) {
+    desc = desc.toLowerCase();
+    if (desc.includes("hujan")) {
+        document.body.style.background = "linear-gradient(to right, #2c3e50, #4ca1af)";
+    } else if (desc.includes("cerah")) {
+        document.body.style.background = "linear-gradient(to right, #56ccf2, #2f80ed)";
+    } else {
+        document.body.style.background = "linear-gradient(to right, #636363, #a2ab58)";
+    }
+}
+
+function getWeather() {
+    const city = document.getElementById("city").value.trim();
+    if (!city) return;
+
+    localStorage.setItem("lastCity", city);
+
+    document.getElementById("loading").innerText = "⏳ Mengambil data cuaca...";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("forecast").innerHTML = "";
+    document.getElementById("agriculture").innerHTML = "";
+
+    fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city},ID&appid=${apiKey}&units=metric&lang=id`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("loading").innerText = "";
+
+            if (data.cod !== "200") {
+                document.getElementById("result").innerHTML = "Kota tidak ditemukan";
                 return;
             }
-            city = `${city},ID`;
-            
-            fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=id`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.cod !== "200") {
-                        document.getElementById('result').innerHTML = `<p style="color: red;">${data.message}</p>`;
-                        return;
-                    }
-                    const temp = data.list[0].main.temp;
-                    const weatherDesc = data.list[0].weather[0].description;
-                    const humidity = data.list[0].main.humidity;
-                    
-                    const weatherInfo = `
-                        <h3>${data.city.name}, ${data.city.country}</h3>
-                        <p>${weatherDesc}</p>
-                        <p>🌡️ Suhu: ${temp}°C</p>
-                        <p>💧 Kelembaban: ${humidity}%</p>
-                        <p>🌬️ Kecepatan Angin: ${data.list[0].wind.speed} m/s</p>
-                    `;
-                    document.getElementById('result').innerHTML = weatherInfo;
-                    showAgricultureAdvice(temp, weatherDesc, humidity);
-                })
-                .catch(error => {
-                    console.error("Error fetching weather data:", error);
-                    document.getElementById('result').innerHTML = "<p style='color: red;'>Terjadi kesalahan. Coba lagi nanti.</p>";
-                });
-        }
 
-        function showAgricultureAdvice(temp, weatherDesc, humidity) {
-            let advice = "";
-            if (temp >= 22 && temp <= 30 && humidity > 60 && weatherDesc.includes("cerah")) {
-                advice = "🌾 Ini waktu yang bagus untuk menanam padi karena suhu dan kelembaban ideal.";
-            } else if (temp >= 15 && temp <= 25 && humidity > 50) {
-                advice = "🥦 Cocok untuk menanam sayuran seperti bayam, kangkung, dan sawi.";
-            } else if (temp < 15) {
-                advice = "⚠️ Cuaca terlalu dingin, sebaiknya hindari menanam tanaman yang membutuhkan suhu tinggi.";
-            } else {
-                advice = "🌱 Cuaca kurang optimal untuk bercocok tanam, tetapi bisa disesuaikan dengan jenis tanaman tertentu.";
+            const now = data.list[0];
+            const desc = now.weather[0].description;
+            setBackground(desc);
+
+            document.getElementById("result").innerHTML = `
+                <div class="card">
+                    <div class="weather-icon">
+                        <img src="https://openweathermap.org/img/wn/${now.weather[0].icon}@2x.png">
+                    </div>
+                    <h3>${data.city.name}</h3>
+                    <p>${desc}</p>
+                    <p>🌡️ ${now.main.temp}°C | 💧 ${now.main.humidity}%</p>
+                </div>
+            `;
+
+            let forecastHTML = "<div class='card'><h4>Perkiraan Singkat</h4>";
+            for (let i = 1; i <= 3; i++) {
+                const f = data.list[i];
+                forecastHTML += `
+                    <div class="forecast">
+                        ${f.dt_txt.slice(11,16)} - ${f.main.temp}°C (${f.weather[0].main})
+                    </div>
+                `;
             }
-            document.getElementById('agriculture-advice').innerHTML = `<p>${advice}</p>`;
-        }
-    </script>
+            forecastHTML += "</div>";
+            document.getElementById("forecast").innerHTML = forecastHTML;
+
+            showAgriculture(now.main.temp, desc, now.main.humidity);
+        });
+}
+
+function showAgriculture(temp, desc, humidity) {
+    let text = "", cls = "";
+
+    if (temp >= 22 && temp <= 30 && humidity > 60 && desc.includes("cerah")) {
+        text = "🟢 Ideal untuk pertanian";
+        cls = "green";
+    } else if (temp >= 15 && temp <= 25) {
+        text = "🟡 Perlu penyesuaian tanaman";
+        cls = "yellow";
+    } else {
+        text = "🔴 Tidak disarankan menanam";
+        cls = "red";
+    }
+
+    document.getElementById("agriculture").innerHTML = `
+        <div class="card badge ${cls}">
+            ${text}
+        </div>
+    `;
+}
+
+function goHome() {
+  window.location.href = "index.html";
+}
+
+function clearAll() {
+    document.getElementById("city").value = "";
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("forecast").innerHTML = "";
+    document.getElementById("agriculture").innerHTML = "";
+    document.getElementById("loading").innerText = "";
+    localStorage.removeItem("lastCity");
+}
+</script>
+
 </body>
 </html>

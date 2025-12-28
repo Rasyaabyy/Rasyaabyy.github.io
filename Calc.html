@@ -9,7 +9,7 @@
             font-family: Poppins, sans-serif;
             text-align: center;
             margin: 0;
-            background: url('https://cdn.pixabay.com/photo/2015/12/23/22/36/minecraft-1106252_1280.jpg');  
+            background: url('https://cdn.pixabay.com/photo/2015/12/23/22/36/minecraft-1106252_1280.jpg');
             background-size: cover;
             background-position: center;
             color: white;
@@ -20,6 +20,7 @@
             position: relative;
             flex-direction: column;
         }
+
         .watermark {
             position: absolute;
             top: 10px;
@@ -30,6 +31,7 @@
             padding: 5px;
             border-radius: 5px;
         }
+
         .calculator {
             padding: 20px;
             border-radius: 10px;
@@ -40,6 +42,7 @@
             width: 90%;
             max-width: 350px;
         }
+
         input {
             margin: 10px;
             padding: 10px;
@@ -50,12 +53,14 @@
             font-size: 16px;
             text-align: center;
         }
+
         .buttons {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-top: 10px;
         }
+
         button {
             padding: 10px;
             border: none;
@@ -68,9 +73,11 @@
             transition: 0.3s;
             width: 100%;
         }
+
         button:hover {
             background-color: #2E8B57;
         }
+
         .history {
             margin-top: 20px;
             padding: 10px;
@@ -81,22 +88,27 @@
             text-align: left;
             max-height: 200px;
             overflow-y: auto;
+            display: grid;
+            gap: 10px;
         }
+
         .history h3 {
             margin: 0;
             padding-bottom: 10px;
             border-bottom: 1px solid white;
         }
+
         .history ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .history li {
             padding: 5px 0;
         }
+
         .clear-btn {
-            margin-top: 10px;
             padding: 10px;
             background-color: #B22222;
             border: none;
@@ -107,38 +119,49 @@
             cursor: pointer;
             transition: 0.3s;
             width: 100%;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            box-sizing: border-box;
         }
+
         .clear-btn:hover {
             background-color: #8B0000;
         }
     </style>
 </head>
 <body>
+
     <div class="watermark">Created by Rasya Aulia Arby</div>
+
     <div class="calculator">
         <h2>Kalkulator</h2>
         <input type="text" id="num1" placeholder="Masukkan angka pertama" oninput="validasiInput(this)">
-        <br>
         <input type="text" id="num2" placeholder="Masukkan angka kedua" oninput="validasiInput(this)">
-        <br>
+
         <div class="buttons">
             <button onclick="hitung('+')">+</button>
             <button onclick="hitung('-')">-</button>
             <button onclick="hitung('*')">×</button>
             <button onclick="hitung('/')">÷</button>
         </div>
+
         <h3>Hasil: <span id="hasil">-</span></h3>
     </div>
+
     <div class="history">
         <h3>Riwayat Perhitungan</h3>
         <ul id="history-list"></ul>
+
         <button class="clear-btn" onclick="clearHistory()">Clear</button>
+        <a href="index.html" class="clear-btn">Home</a>
     </div>
+
     <script>
         function validasiInput(input) {
             input.value = input.value.replace(/[^0-9.]/g, '');
         }
-        
+
         function hitung(operator) {
             let num1 = parseFloat(document.getElementById("num1").value);
             let num2 = parseFloat(document.getElementById("num2").value);
@@ -153,20 +176,15 @@
                     case '-': hasil = num1 - num2; break;
                     case '*': hasil = num1 * num2; break;
                     case '/':
-                        if (num2 === 0) {
-                            hasil = "Error: Pembagian dengan nol";
-                        } else {
-                            hasil = num1 / num2;
-                        }
+                        hasil = num2 === 0 ? "Error: Pembagian dengan nol" : num1 / num2;
                         break;
-                    default: hasil = "Operasi tidak valid";
                 }
 
-                // Tambahkan ke riwayat
                 let listItem = document.createElement("li");
                 listItem.textContent = `${num1} ${operator} ${num2} = ${hasil}`;
                 historyList.appendChild(listItem);
             }
+
             document.getElementById("hasil").innerText = hasil;
         }
 
@@ -174,5 +192,6 @@
             document.getElementById("history-list").innerHTML = "";
         }
     </script>
+
 </body>
 </html>
